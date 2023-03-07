@@ -32,9 +32,9 @@ function startUp(displays: Electron.Display[], mainDisplay: Electron.Display): v
   for (let i = 0; i < LAYERS; i++) {
     for (const display of displays) {
       if (display.id === mainDisplay.id) {
-        createUnkillableKioskWindow(mainWindowConfig, display, 'index.html')
+        createWindow(mainWindowConfig, display, 'index.html')
       } else {
-        createUnkillableKioskWindow(sideWindowConfig, display, 'side.html')
+        createWindow(sideWindowConfig, display, 'side.html')
       }
     }
   }
@@ -51,7 +51,7 @@ app.whenReady().then(() => {
 
   startUp(displays, mainDisplay)
   ipcMain.handle('close', () => {
-    console.log("Closing app...")
+    console.log('Closing app...')
     BrowserWindow.getAllWindows().forEach((window) => window.setClosable(true))
     BrowserWindow.getAllWindows().forEach((window) => window.removeAllListeners())
     app.quit()

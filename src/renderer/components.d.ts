@@ -9,9 +9,13 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    CiRedo: typeof import('~icons/ci/redo')['default']
+    IcOutlineLockOpen: typeof import('~icons/ic/outline-lock-open')['default']
     IcOutlineLockPerson: typeof import('~icons/ic/outline-lock-person')['default']
     IcRoundClose: typeof import('~icons/ic/round-close')['default']
+    IcRoundNavigateNext: typeof import('~icons/ic/round-navigate-next')['default']
+    MaterialSymbolsLockOutline: typeof import('~icons/material-symbols/lock-outline')['default']
+    MdiLockOpenVariantOutline: typeof import('~icons/mdi/lock-open-variant-outline')['default']
     Task: typeof import('./src/components/Task.vue')['default']
-    Versions: typeof import('./src/components/Versions.vue')['default']
   }
 }
