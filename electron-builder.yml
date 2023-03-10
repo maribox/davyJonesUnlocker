@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: davy-jones-unlocker
+appId: it.bosler.davy-jones-unlocker
+productName: Davy Jones' Unlocker 🏴‍☠️
 directories:
   buildResources: build
 files:
@@ -12,7 +12,8 @@ asarUnpack:
   - resources/*
 afterSign: build/notarize.js
 win:
-  executableName: davy-jones-unlocker
+  executableName: Davy Jones' Unlocker
+  publisherName: bosler.it
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -32,11 +33,11 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
+  maintainer: bosler.it
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.com/auto-updates
+  url: https://bosler.it/auto-updates

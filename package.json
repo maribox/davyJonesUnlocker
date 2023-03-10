@@ -1,7 +1,7 @@
 {
   "name": "davy-jones-unlocker",
   "version": "1.0.0",
-  "description": "An Electron application with Vue and TypeScript",
+  "description": "\uD83C\uDFF4\u200D☠️\uD83D\uDD12 Davy Jones' Unlocker: A productivity app that keeps your computer locked until you solve a set of tasks! \uD83C\uDF93\uD83E\uDDEE\uD83D\uDCBB\uD83D\uDD13",
   "main": "./out/main/index.js",
   "author": "example.com",
   "homepage": "https://www.electronjs.org",
@@ -33,6 +33,7 @@
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@electron/notarize": "^1.2.3",
+    "electron-builder": "^23.6.0",
     "@iconify-json/carbon": "^1.1.16",
     "@iconify-json/ci": "^1.1.8",
     "@iconify-json/ic": "^1.1.13",
