@@ -7,10 +7,16 @@ import Components from 'unplugin-vue-components/vite'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    build: {
+      //outDir: 'dist/main'
+    }
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    build: {
+      //outDir: 'dist/preload'
+    }
   },
   renderer: {
     resolve: {
@@ -34,6 +40,7 @@ export default defineConfig({
           side: resolve(__dirname, 'src/renderer/side.html')
         }
       }
+      //outDir: resolve(__dirname, 'dist/renderer')
     }
   }
 })

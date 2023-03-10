@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Difficulty, TaskType } from '../types/types'
 import { PropType, ref } from 'vue'
-import { generateDate } from './Task.ts'
+import { generateDate } from './sharedFunctions'
 
 const props = defineProps({
   taskType: {
@@ -34,7 +34,7 @@ const weekdays = new Array(7)
 const showInput = ref(false)
 const showSelect = ref(false)
 
-const selectOptions = ref([])
+const selectOptions = ref<string[]>([])
 const selectLabel = ref('OptionCategory')
 const selectType = ref('')
 let currentDate = new Date()
@@ -45,7 +45,8 @@ function testDate(): boolean {
 }
 
 function testCalculation(): boolean {
-  const solution = solutionInput.value
+  // TODO
+  //  const solution = solutionInput.value
   return true
 }
 

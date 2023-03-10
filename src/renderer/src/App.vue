@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Task from './components/Task.vue'
 import StepProgress from './components/StepProgress.vue'
-import { Difficulty, TaskType } from './types/types'
+import { Difficulty, TaskType, ITask } from './types/types'
 
 import { ref } from 'vue'
 const close = async (): Promise<void> => {
@@ -20,7 +20,8 @@ const LOCALE = 'de-DE'
 const shakeRedLock = ref(false)
 const locked = ref(0)
 const currentTask = ref(0)
-const tasks = []
+
+const tasks: ITask[] = []
 for (let i = 0; i < NUMBER_OF_TASKS; i++) {
   tasks.push({
     taskType: ALLOWED_TASK_TYPES[Math.floor(Math.random() * ALLOWED_TASK_TYPES.length)],

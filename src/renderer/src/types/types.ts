@@ -10,3 +10,8 @@ export enum Difficulty {
   hard,
   very_hard
 }
+
+export type ITask = {
+  taskType: TaskType
+  difficulty: Difficulty
+}
