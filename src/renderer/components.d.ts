@@ -16,6 +16,7 @@ declare module '@vue/runtime-core' {
     IcRoundNavigateNext: typeof import('~icons/ic/round-navigate-next')['default']
     MaterialSymbolsLockOutline: typeof import('~icons/material-symbols/lock-outline')['default']
     MdiLockOpenVariantOutline: typeof import('~icons/mdi/lock-open-variant-outline')['default']
+    StepProgress: typeof import('./src/components/StepProgress.vue')['default']
     Task: typeof import('./src/components/Task.vue')['default']
   }
 }

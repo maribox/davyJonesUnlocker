@@ -19,16 +19,14 @@ export default defineConfig({
         '@srcside': resolve('src/renderer/srcside')
       }
     },
-    plugins: [vue(),
-    Components({
-      resolvers: [
-        IconsResolver({ prefix: false }),
-      ],
-    }),
-      Icons(
-      {autoInstall: true}
-    ),
-],
+    plugins: [
+      vue(),
+      Components({
+        resolvers: [IconsResolver({ prefix: false })]
+      }),
+      Icons({ autoInstall: true })
+    ],
+
     build: {
       rollupOptions: {
         input: {

@@ -17,13 +17,17 @@
     "postinstall": "electron-builder install-app-deps",
     "build:win": "npm run build && electron-builder --win --config",
     "build:mac": "npm run build && electron-builder --mac --config",
-    "build:linux": "npm run build && electron-builder --linux --config"
+    "build:linux": "npm run build && electron-builder --linux --config",
+    "webstorm-integration": "vitest --watch --reporter=dot --reporter=json --outputFile=.vitest-result.json",
+    "test": "vitest --dom"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^1.0.3",
     "@electron-toolkit/utils": "^1.0.2",
+    "@vitejs/plugin-vue": "^4.0.0",
     "electron-localshortcut": "^3.2.1",
     "electron-updater": "^5.3.0",
+    "happy-dom": "^8.9.0",
     "vuetify": "^3.1.7"
   },
   "devDependencies": {
@@ -35,11 +39,13 @@
     "@iconify-json/material-symbols": "^1.1.33",
     "@iconify-json/mdi": "^1.1.49",
     "@iconify-json/uil": "^1.1.4",
+    "@peeky/server": "^0.14.0",
+    "@peeky/test": "^0.14.1",
     "@rushstack/eslint-patch": "^1.2.0",
     "@types/node": "^16.18.11",
-    "@vitejs/plugin-vue": "^4.0.0",
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/eslint-config-typescript": "^11.0.2",
+    "@vue/test-utils": "^2.3.0",
     "electron": "^21.3.3",
     "electron-builder": "^23.6.0",
     "electron-vite": "^1.0.17",
@@ -50,6 +56,7 @@
     "unplugin-icons": "^0.15.3",
     "unplugin-vue-components": "^0.24.0",
     "vite": "^4.0.4",
+    "vitest": "^0.29.2",
     "vue": "^3.2.45",
     "vue-tsc": "^1.0.22"
   }

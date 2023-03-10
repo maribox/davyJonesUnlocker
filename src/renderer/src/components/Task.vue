@@ -1,33 +1,76 @@
 <script setup lang="ts">
 import { Difficulty, TaskType } from '../types/types'
 import { PropType, ref } from 'vue'
+import { generateDate } from './Task.ts'
 
 const props = defineProps({
   taskType: {
-    type: Object as PropType<TaskType>,
+    type: Number as PropType<TaskType>,
     required: true
   },
   difficulty: {
-    type: Object as PropType<Difficulty>,
+    type: Number as PropType<Difficulty>,
     default: Difficulty.medium,
     required: false
+  },
+  locale: {
+    type: String,
+    required: true
   }
 })
+console.log(props)
 
 const emit = defineEmits(['response'])
 
-console.log(props)
 const solutionInput = ref('')
 const taskText = ref('TASK')
 const taskContent = ref('CONTENT')
-const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const weekdays = new Array(7)
+  .fill(0)
+  .map((_, index) =>
+    new Date(Date.UTC(2000, 0, index + 2)).toLocaleString(props.locale, { weekday: 'long' })
+  )
 
 const showInput = ref(false)
 const showSelect = ref(false)
 
 const selectOptions = ref([])
-const selectedOption = ref('OptionCategory')
+const selectLabel = ref('OptionCategory')
 const selectType = ref('')
+let currentDate = new Date()
+
+function testDate(): boolean {
+  const solution = solutionInput.value
+  return weekdays.indexOf(solution) == currentDate.getDay()
+}
+
+function testCalculation(): boolean {
+  const solution = solutionInput.value
+  return true
+}
+
+const solutionTesters = {
+  [TaskType.Calculating]: testCalculation,
+  [TaskType.WeekdayCalculating]: testDate
+}
+
+function testSolution(): void {
+  const result = solutionTesters[props.taskType]()
+  if (!result) {
+    displayNewDate()
+  }
+  emit('response', result)
+}
+
+function displayNewDate(): void {
+  currentDate = generateDate(props.difficulty)
+  taskContent.value = currentDate.toLocaleDateString(props.locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
+
 switch (props.taskType) {
   case TaskType.Calculating:
     taskText.value = 'Solve the following equation:'
@@ -35,11 +78,12 @@ switch (props.taskType) {
     showInput.value = true
     showSelect.value = false
     break
+
   case TaskType.WeekdayCalculating:
     taskText.value = 'Select the weekday of the following date'
-    taskContent.value = '01.01.2021'
+    displayNewDate()
     selectOptions.value = weekdays
-    selectedOption.value = 'Weekday'
+    selectLabel.value = 'Weekday'
     selectType.value = 'weekdaySelect'
 
     showInput.value = false
@@ -56,7 +100,7 @@ switch (props.taskType) {
       @submit="
         (e) => {
           e.preventDefault()
-          emit('response', 0)
+          testSolution()
         }
       "
     >
@@ -69,9 +113,11 @@ switch (props.taskType) {
       />
       <v-select
         v-if="showSelect"
-        :label="selectedOption"
+        v-model="solutionInput"
+        :label="selectLabel"
         :items="selectOptions"
         :class="'solution ' + selectType"
+        :menu-props="{ maxHeight: 'unset' }"
       >
       </v-select>
 
@@ -138,13 +184,13 @@ switch (props.taskType) {
     width: 80px;
     border-radius: 10px;
     border: none;
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
     font-size: 30px;
     text-align: center;
   }
   .submitButton:hover {
     cursor: pointer;
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
   }
 }
 </style>
