@@ -24,15 +24,6 @@ export function generateDate(difficulty: Difficulty): Date {
   date.setDate(getRandomDay(date.getMonth(), date.getFullYear()))
   return date
 
-  function customBoxMuller(mean: number, stdev: number): number {
-    let u = 0,
-      v = 0
-    while (u === 0) u = Math.random() // Converting [0,1) to (0,1)
-    while (v === 0) v = Math.random()
-    const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v)
-    return z * stdev + mean
-  }
-
   function getRandomYearAround(year: number, distanceAroundYear: number, stdDev = 20): number {
     do {
       // convert year to int
@@ -69,4 +60,51 @@ export function generateDate(difficulty: Difficulty): Date {
         throw new Error('Invalid month')
     }
   }
+}
+
+export function customBoxMuller(mean: number, stdev: number): number {
+  let u = 0,
+    v = 0
+  while (u === 0) u = Math.random() // Converting [0,1) to (0,1)
+  while (v === 0) v = Math.random()
+  const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v)
+  return z * stdev + mean
+}
+
+export function randomMathTermString(difficulty: Difficulty): string {
+  let termLength: number
+  switch (difficulty) {
+    case Difficulty.very_easy:
+      termLength = 2
+      break
+    case Difficulty.easy:
+    case Difficulty.medium:
+    case Difficulty.hard:
+    case Difficulty.very_hard:
+      termLength = difficulty
+      break
+  }
+  const operators = ['+', '-', '*', '/']
+  let termNumber = Math.floor(customBoxMuller(2, 5 * difficulty))
+  let term = `${termNumber >= 0 ? termNumber : '(' + termNumber + ')'}`
+  let operator: string
+  for (let i = 0; i < termLength; i++) {
+    operator = operators[Math.floor(Math.random() * operators.length)]
+    switch (operator) {
+      case '+':
+        termNumber = Math.floor(customBoxMuller(20, 10 * difficulty))
+        term += ` ${operator} ${termNumber >= 0 ? termNumber : '(' + termNumber + ')'}`
+        break
+      case '-':
+        termNumber = Math.floor(customBoxMuller(2, 10 * difficulty))
+        term += ` ${operator} ${termNumber > 0 ? termNumber : -(termNumber - 1)}`
+        break
+      case '*':
+      case '/':
+        termNumber = Math.floor(customBoxMuller(3, 3 * difficulty))
+        term += ` ${operator} ${termNumber > 0 ? termNumber : -(termNumber - 1)}`
+        break
+    }
+  }
+  return term
 }

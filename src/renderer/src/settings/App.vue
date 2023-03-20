@@ -56,7 +56,7 @@ const selectDifficulties = [
 const selectedTaskTypes = ref<TaskType[]>([TaskType.WeekdayCalculating])
 let lastValidState = [...selectedTaskTypes.value]
 const selectTaskTypes = [
-  //{ title: 'Calculating', value: TaskType.Calculating },
+  { title: 'Calculating', value: TaskType.Calculating },
   { title: 'Weekday Calculating', value: TaskType.WeekdayCalculating }
 ]
 
@@ -129,7 +129,7 @@ function checkValidTaskTypes(e): void {
         </div>
       </div>
     </v-card>
-    <v-btn class="mt-4" @click="closeSettings">Back</v-btn>
+    <v-btn class="mt-4" @click="closeSettings">Save and Back</v-btn>
   </v-container>
 </template>
 

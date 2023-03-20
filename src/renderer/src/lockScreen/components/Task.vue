@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Difficulty, TaskType } from '../../../types/types'
 import { PropType, ref, watch } from 'vue'
-import { generateDate } from './sharedFunctions'
+import { generateDate, randomMathTermString } from './sharedFunctions'
+import MathTerm from '../../../types/MathTerm'
 
 const props = defineProps({
   taskType: {
@@ -40,6 +41,8 @@ const selectOptions = ref<string[]>([])
 const selectLabel = ref('OptionCategory')
 const selectType = ref('')
 let currentDate = new Date()
+let currentCalculation: MathTerm
+let currentCalculationString: string
 
 function testDate(): boolean {
   const solution = solutionInput.value
@@ -47,9 +50,17 @@ function testDate(): boolean {
 }
 
 function testCalculation(): boolean {
-  // TODO
-  //  const solution = solutionInput.value
-  return true
+  const solution = solutionInput.value
+  if (solution == '') {
+    return false
+  }
+  const solutionNumber = Number(solution)
+  if (isNaN(solutionNumber)) {
+    return false
+  }
+  if (Math.round(solutionNumber) == Math.round(currentCalculation.evaluate())) {
+    return true
+  }
 }
 
 const solutionTesters = {
@@ -57,10 +68,19 @@ const solutionTesters = {
   [TaskType.WeekdayCalculating]: testDate
 }
 
+const reloaders = {
+  [TaskType.Calculating]: displayNewCalculation,
+  [TaskType.WeekdayCalculating]: displayNewDate
+}
+
+function reloadTask(): void {
+  reloaders[props.taskType]()
+}
+
 function testSolution(): void {
   const result = solutionTesters[props.taskType]()
   if (!result) {
-    displayNewDate()
+    reloaders[props.taskType]()
   }
   emit('response', result)
 }
@@ -74,12 +94,20 @@ function displayNewDate(): void {
   })
 }
 
+function displayNewCalculation(): void {
+  currentCalculationString = randomMathTermString(props.difficulty)
+  currentCalculation = new MathTerm(currentCalculationString)
+  taskContent.value = currentCalculationString
+}
+
 switch (props.taskType) {
   case TaskType.Calculating:
-    taskText.value = 'Solve the following equation:'
-
-    showInput.value = true
+    taskText.value = 'Solve the following equation: (round to the nearest integer)'
+    // create a random calculation
+    displayNewCalculation()
     showSelect.value = false
+    showInput.value = true
+
     break
 
   case TaskType.WeekdayCalculating:
@@ -125,7 +153,7 @@ switch (props.taskType) {
       </v-select>
 
       <div class="buttonContainer">
-        <v-btn variant="tonal" class="submitButton" :disabled="true" height="60px">
+        <v-btn variant="tonal" class="submitButton" height="60px" @click="reloadTask">
           <ci-redo height="45px" width="45px" />
         </v-btn>
         <v-btn variant="tonal" class="submitButton" type="submit" height="60px">
@@ -169,6 +197,7 @@ switch (props.taskType) {
   font-size: 30px;
   height: 70px;
   text-align: center;
+  color: white;
 }
 
 .weekdaySelect {
