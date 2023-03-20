@@ -1,20 +1,20 @@
-import { Difficulty } from '../types/types'
+import { Difficulty } from '../../../types/types'
 
 export function generateDate(difficulty: Difficulty): Date {
   const date = new Date()
 
   switch (difficulty) {
     case Difficulty.very_easy:
-      date.setFullYear(getRandomYearAround(date.getFullYear(), 3, 0))
+      date.setFullYear(getRandomYearAround(date.getFullYear(), 10, 5))
       break
     case Difficulty.easy:
-      date.setFullYear(getRandomYearAround(date.getFullYear(), 5, 2))
+      date.setFullYear(getRandomYearAround(date.getFullYear(), 25, 10))
       break
     case Difficulty.medium:
-      date.setFullYear(getRandomYearAround(date.getFullYear(), 20, 10))
+      date.setFullYear(getRandomYearAround(date.getFullYear(), 50, 25))
       break
     case Difficulty.hard:
-      date.setFullYear(getRandomYearAround(date.getFullYear(), 100, 25))
+      date.setFullYear(getRandomYearAround(date.getFullYear(), 100, 50))
       break
     case Difficulty.very_hard:
       date.setFullYear(getRandomYearAround(date.getFullYear(), 1000, 100))

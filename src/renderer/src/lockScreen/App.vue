@@ -1,33 +1,43 @@
 <script setup lang="ts">
 import Task from './components/Task.vue'
 import StepProgress from './components/StepProgress.vue'
-import { Difficulty, TaskType, ITask } from './types/types'
-
+import { Difficulty, TaskType, ITask, IPC, Settings } from '../../types/types'
 import { ref } from 'vue'
+
+interface Window {
+  ipc?: IPC
+}
 const close = async (): Promise<void> => {
-  // @ts-ignore - preload script adds this
   await window.ipc.closeApp()
 }
 
-const NUMBER_OF_TASKS = 3
-const ALLOWED_TASK_TYPES = [
-  //  TaskType.Calculating,
-  TaskType.WeekdayCalculating
-]
-const DIFFICULTY = Difficulty.medium
-const LOCALE = 'de-DE'
+const openSettings = async (): Promise<void> => {
+  await window.ipc.openSettings()
+}
+
+const getSettings = async (): Promise<any> => {
+  return await window.ipc.getSettings()
+}
 
 const shakeRedLock = ref(false)
 const locked = ref(0)
 const currentTask = ref(0)
-
-const tasks: ITask[] = []
-for (let i = 0; i < NUMBER_OF_TASKS; i++) {
-  tasks.push({
-    taskType: ALLOWED_TASK_TYPES[Math.floor(Math.random() * ALLOWED_TASK_TYPES.length)],
-    difficulty: DIFFICULTY
-  })
-}
+const loaded = ref(false)
+let NUMBER_OF_TASKS, ALLOWED_TASK_TYPES, DIFFICULTY, LOCALE, tasks: ITask[]
+getSettings().then((settings: Settings) => {
+  NUMBER_OF_TASKS = settings.numberOfTasks
+  ALLOWED_TASK_TYPES = settings.allowedTasks
+  DIFFICULTY = settings.difficulty
+  LOCALE = settings.locale
+  tasks = []
+  for (let i = 0; i < NUMBER_OF_TASKS; i++) {
+    tasks.push({
+      taskType: ALLOWED_TASK_TYPES[Math.floor(Math.random() * ALLOWED_TASK_TYPES.length)],
+      difficulty: DIFFICULTY
+    })
+  }
+  loaded.value = true
+})
 
 function taskResponse(response: boolean): void {
   if (response) {
@@ -56,9 +66,12 @@ function unlock(): void {
 
 <template>
   <div @click="close">
-    <ic-round-close class="quit-button" />
+    <ic-round-close class="appButton closeButton" />
   </div>
-  <div class="halves-container">
+  <div @click="openSettings">
+    <ic-round-settings class="appButton settingsButton" />
+  </div>
+  <div v-if="loaded" class="halves-container">
     <div class="main">
       <h1>LOCKED</h1>
       <ic-outline-lock-person
@@ -106,15 +119,25 @@ function unlock(): void {
   font-size: 25px;
 }
 
-.quit-button {
-  position: absolute;
-  height: 75px;
-  width: 75px;
+.closeButton {
   top: 15px;
   right: 15px;
 }
 
-.quit-button:hover {
+.settingsButton {
+  top: 15px;
+  left: 15px;
+  height: 65px;
+  width: 65px;
+}
+
+.appButton {
+  position: absolute;
+  height: 75px;
+  width: 75px;
+}
+
+.appButton:hover {
   color: #7e0202;
 }
 

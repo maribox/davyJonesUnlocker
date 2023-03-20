@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="circle-container">
+  <div class="settings-container">
     <div class="circle">
       <div class="halo"></div>
       <material-symbols-lock-outline class="lock-icon"></material-symbols-lock-outline>
@@ -18,7 +18,7 @@ body {
   background-color: #2f3241;
   overflow: hidden;
 }
-.circle-container {
+.settings-container {
   display: flex;
   flex-direction: column;
   align-items: center;

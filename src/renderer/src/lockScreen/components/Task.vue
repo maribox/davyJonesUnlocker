@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Difficulty, TaskType } from '../types/types'
-import { PropType, ref } from 'vue'
+import { Difficulty, TaskType } from '../../../types/types'
+import { PropType, ref, watch } from 'vue'
 import { generateDate } from './sharedFunctions'
 
 const props = defineProps({
@@ -18,7 +18,9 @@ const props = defineProps({
     required: true
   }
 })
-console.log(props)
+watch([props.taskType, props.difficulty, props.locale], () => {
+  displayNewDate()
+})
 
 const emit = defineEmits(['response'])
 

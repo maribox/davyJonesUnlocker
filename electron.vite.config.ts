@@ -21,8 +21,7 @@ export default defineConfig({
   renderer: {
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src'),
-        '@srcside': resolve('src/renderer/srcside')
+        '@renderer': resolve('src/renderer/src')
       }
     },
     plugins: [
@@ -37,7 +36,8 @@ export default defineConfig({
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'src/renderer/index.html'),
-          side: resolve(__dirname, 'src/renderer/side.html')
+          side: resolve(__dirname, 'src/renderer/side.html'),
+          settings: resolve(__dirname, 'src/renderer/settings.html')
         }
       }
       //outDir: resolve(__dirname, 'dist/renderer')

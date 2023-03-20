@@ -2,33 +2,35 @@ import { app, BrowserWindow, screen, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import * as storage from 'electron-json-storage'
+import { Difficulty, TaskType, Settings } from '../renderer/types/types'
+const ISO6391 = require('iso-639-1')
 
 const LAYERS = 1
+const mainWindowConfig = {
+  kiosk: true,
+  show: true,
+  autoHideMenuBar: true,
+  ...(process.platform === 'linux' ? { icon } : {}),
+  webPreferences: {
+    preload: join(__dirname, '../preload/index.js'),
+    sandbox: is.dev,
+    devTools: is.dev
+  }
+}
+
+const sideWindowConfig = {
+  kiosk: true,
+  show: true,
+  autoHideMenuBar: true,
+  ...(process.platform === 'linux' ? { icon } : {}),
+  webPreferences: {
+    sandbox: is.dev,
+    devTools: is.dev
+  }
+}
 
 function startUp(displays: Electron.Display[], mainDisplay: Electron.Display): void {
-  const mainWindowConfig = {
-    kiosk: true,
-    show: true,
-    autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: is.dev,
-      devTools: is.dev
-    }
-  }
-
-  const sideWindowConfig = {
-    kiosk: true,
-    show: true,
-    autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      sandbox: is.dev,
-      devTools: is.dev
-    }
-  }
-
   for (let i = 0; i < LAYERS; i++) {
     for (const display of displays) {
       if (display.id === mainDisplay.id) {
@@ -38,6 +40,22 @@ function startUp(displays: Electron.Display[], mainDisplay: Electron.Display): v
       }
     }
   }
+}
+
+function isValidSettings(settings: any): settings is Settings {
+  return (
+    settings &&
+    Object.values(Difficulty).includes(settings.difficulty) &&
+    Array.isArray(settings.allowedTasks) &&
+    settings.allowedTasks.every((task) => Object.values(TaskType).includes(task)) &&
+    typeof settings.numberOfTasks === 'number' &&
+    typeof settings.locale === 'string' &&
+    isValidLocale(settings.locale)
+  )
+}
+
+function isValidLocale(locale: string): boolean {
+  return ISO6391.validate(locale)
 }
 
 app.whenReady().then(() => {
@@ -50,11 +68,56 @@ app.whenReady().then(() => {
   })
 
   startUp(displays, mainDisplay)
+
   ipcMain.handle('close', () => {
     console.log('Closing app...')
     BrowserWindow.getAllWindows().forEach((window) => window.setClosable(true))
     BrowserWindow.getAllWindows().forEach((window) => window.removeAllListeners())
     app.quit()
+  })
+
+  ipcMain.handle('open-settings', () => {
+    createWindow(mainWindowConfig, mainDisplay, 'settings.html')
+  })
+
+  ipcMain.handle('close-settings', () => {
+    console.log('closing settings')
+    BrowserWindow.getAllWindows()
+      .filter((window) => window.webContents.getURL().includes('settings.html'))
+      .forEach((window) => window.close())
+    BrowserWindow.getAllWindows()
+      .filter((window) => window.webContents.getURL().includes('index.html'))
+      .forEach((window) => window.reload())
+  })
+
+  ipcMain.handle('get-settings', () => {
+    console.log('getting settings')
+    let settings = storage.getSync('settings')
+    if (JSON.stringify(settings) === '{}' || !isValidSettings(settings)) {
+      console.log('No valid settings found. Setting default settings')
+      settings = {
+        difficulty: Difficulty.medium,
+        numberOfTasks: 3,
+        allowedTasks: [TaskType.WeekdayCalculating],
+        locale: 'en'
+      }
+      storage.set('settings', settings, (error) => {
+        if (error) throw error
+      })
+    } else {
+      console.log('settings found')
+    }
+    return settings
+  })
+
+  ipcMain.handle('set-settings', (_event, settings: string) => {
+    const settingsObj = JSON.parse(settings)
+    console.log('setting settings to:')
+    console.log(settings)
+    storage.set('settings', settingsObj, (error) => {
+      if (error) throw error
+    })
+    return true
   })
 
   app.on('activate', function () {
