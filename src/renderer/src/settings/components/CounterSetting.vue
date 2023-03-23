@@ -42,7 +42,7 @@ function decrement(): void {
 </script>
 
 <style>
-.number {
+.wholeNumber {
   display: flex;
   justify-content: center;
   align-items: center;

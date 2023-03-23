@@ -97,7 +97,6 @@ export default class MathTerm {
       case '*':
       case '/':
         return 2
-
       default:
         return Infinity
     }

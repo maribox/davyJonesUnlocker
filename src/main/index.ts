@@ -36,7 +36,7 @@ function startUp(displays: Electron.Display[], mainDisplay: Electron.Display): v
       if (display.id === mainDisplay.id) {
         createWindow(mainWindowConfig, display, 'index.html')
       } else {
-        //createWindow(sideWindowConfig, display, 'side.html')
+        createWindow(sideWindowConfig, display, 'side.html')
       }
     }
   }

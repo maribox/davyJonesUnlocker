@@ -96,7 +96,7 @@ function unlock(): void {
 </template>
 
 <style lang="less">
-@import './assets/css/styles.less';
+@import 'assets/css/styles.scss';
 
 .steps {
   margin-top: 50px;

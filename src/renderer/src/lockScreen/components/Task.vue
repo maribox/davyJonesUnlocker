@@ -22,12 +22,17 @@ const props = defineProps({
 watch([props.taskType, props.difficulty, props.locale], () => {
   displayNewDate()
 })
-
 const emit = defineEmits(['response'])
 
-const solutionInput = ref('')
+enum InputType {
+  wholeNumber = 'wholeNumber',
+  text = 'text'
+}
+
+const solutionInputs = ref([])
 const taskText = ref('TASK')
 const taskContent = ref('CONTENT')
+
 const weekdays = new Array(7)
   .fill(0)
   .map((_, index) =>
@@ -36,30 +41,53 @@ const weekdays = new Array(7)
 
 const showInput = ref(false)
 const showSelect = ref(false)
+const showFractionInput = ref(false)
 
+const inputType = ref(InputType.wholeNumber)
 const selectOptions = ref<string[]>([])
 const selectLabel = ref('OptionCategory')
-const selectType = ref('')
+
 let currentDate = new Date()
 let currentCalculation: MathTerm
 let currentCalculationString: string
 
 function testDate(): boolean {
-  const solution = solutionInput.value
+  const solution = solutionInputs.value[0]
   return weekdays.indexOf(solution) == currentDate.getDay()
 }
 
 function testCalculation(): boolean {
-  const solution = solutionInput.value
-  if (solution == '') {
-    return false
-  }
-  const solutionNumber = Number(solution)
-  if (isNaN(solutionNumber)) {
-    return false
-  }
-  if (Math.round(solutionNumber) == Math.round(currentCalculation.evaluate())) {
-    return true
+  if (showFractionInput.value) {
+    // fraction
+    const solutionWhole = solutionInputs.value[0]
+    const solutionNumerator = solutionInputs.value[1]
+    const solutionDenominator = solutionInputs.value[2]
+    if (
+      Number(solutionWhole) % 1 != 0 ||
+      Number(solutionNumerator) % 1 != 0 ||
+      Number(solutionDenominator) % 1 != 0
+    ) {
+      return false
+    }
+    const solutionNumber = new MathTerm(
+      `${solutionWhole} + ${solutionNumerator}/${solutionDenominator}`
+    )
+    if (solutionNumber.evaluate() == currentCalculation.evaluate()) {
+      return true
+    }
+  } else {
+    // whole number
+    const solution = solutionInputs.value[0]
+    if (solution == '') {
+      return false
+    }
+    const solutionNumber = Number(solution)
+    if (isNaN(solutionNumber)) {
+      return false
+    }
+    if (Math.round(solutionNumber) == Math.round(currentCalculation.evaluate())) {
+      return true
+    }
   }
 }
 
@@ -98,20 +126,31 @@ function displayNewCalculation(): void {
   currentCalculationString = randomMathTermString(props.difficulty)
   currentCalculation = new MathTerm(currentCalculationString)
   taskContent.value = currentCalculationString
+  const solutionValue = currentCalculation.evaluate()
+  if (solutionValue % 1 != 0) {
+    showFractionInput.value = true
+    solutionInputs.value = ['', '', '']
+    showInput.value = false
+  } else {
+    showFractionInput.value = false
+    solutionInputs.value = ['']
+    showInput.value = true
+  }
 }
 
 switch (props.taskType) {
   case TaskType.Calculating:
-    taskText.value = 'Solve the following equation: (round to the nearest integer)'
+    taskText.value = 'Solve the following equation:'
     // create a random calculation
-    displayNewCalculation()
     showSelect.value = false
     showInput.value = true
-
+    inputType.value = InputType.wholeNumber
+    displayNewCalculation()
     break
 
   case TaskType.WeekdayCalculating:
     taskText.value = 'Select the weekday of the following date'
+    solutionInputs.value = ['']
     displayNewDate()
     selectOptions.value = weekdays
     selectLabel.value = 'Weekday'
@@ -137,14 +176,22 @@ switch (props.taskType) {
     >
       <input
         v-if="showInput"
-        v-model="solutionInput"
+        v-model="solutionInputs[0]"
         type="text"
-        class="solution"
-        placeholder="Solution"
+        :class="'solution' + ' ' + inputType"
+        :placeholder="inputType != 'wholeNumber' ? 'Solution' : ''"
       />
+      <div v-if="showFractionInput" class="solution fraction">
+        <input v-model="solutionInputs[0]" type="text" placeholder="" class="Whole" />
+        <div class="fractionComponent">
+          <input v-model="solutionInputs[1]" type="text" placeholder="" class="Numerator" />
+          <div class="fractionBar"></div>
+          <input v-model="solutionInputs[2]" type="text" placeholder="" class="Denominator" />
+        </div>
+      </div>
       <v-select
         v-if="showSelect"
-        v-model="solutionInput"
+        v-model="solutionInputs[0]"
         :label="selectLabel"
         :items="selectOptions"
         :class="'solution ' + selectType"
@@ -164,8 +211,8 @@ switch (props.taskType) {
   </div>
 </template>
 
-<style lang="less">
-@import '../assets/css/styles.less';
+<style lang="scss">
+@import '../assets/css/styles';
 
 .taskArea {
   display: flex;
@@ -198,6 +245,64 @@ switch (props.taskType) {
   height: 70px;
   text-align: center;
   color: white;
+  background-color: #f5f5f511;
+  border-radius: 10px;
+}
+
+input {
+  outline: none;
+  color: white;
+}
+
+.solution.wholeNumber {
+  width: 180px;
+  height: 80px;
+  font-size: 50px;
+}
+
+.solution.fraction {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 150px;
+
+  .Whole {
+    width: 70px;
+    background-color: #f5f5f511;
+    border-radius: 10% 0% 0% 10%;
+    text-align: center;
+    padding: 5px;
+    font-size: 40px;
+  }
+  .fractionComponent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f511;
+    border-radius: 10%;
+    padding: 2px;
+    font-size: 30px;
+    height: 120px;
+    width: 90px;
+    .Numerator {
+      text-align: center;
+      width: 50px;
+    }
+    .fractionBar {
+      width: 60px;
+      height: 2px;
+      background-color: white;
+      margin-bottom: 5px;
+      margin-top: 5px;
+    }
+    .Denominator {
+      text-align: center;
+      width: 50px;
+    }
+  }
 }
 
 .weekdaySelect {
