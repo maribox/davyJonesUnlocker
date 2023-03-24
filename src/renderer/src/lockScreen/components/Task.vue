@@ -32,6 +32,7 @@ enum InputType {
 const solutionInputs = ref([])
 const taskText = ref('TASK')
 const taskContent = ref('CONTENT')
+const selectType = ref('')
 
 const weekdays = new Array(7)
   .fill(0)
@@ -70,8 +71,17 @@ function testCalculation(): boolean {
       return false
     }
     const solutionNumber = new MathTerm(
-      `${solutionWhole} + ${solutionNumerator}/${solutionDenominator}`
+      `${solutionWhole} ${
+        solutionWhole.trim().startsWith('-') ? '-' : '+' // if the whole number is negative, the fraction is negative
+      } ${solutionNumerator}/${solutionDenominator}`
     )
+    console.log(solutionNumber.evaluate(), currentCalculation.evaluate())
+    console.log(
+      `${solutionWhole} ${
+        solutionWhole.trim().startsWith('-') ? '-' : '+' // if the whole number is negative, the fraction is negative
+      } ${solutionNumerator}/${solutionDenominator}`
+    )
+
     if (solutionNumber.evaluate() == currentCalculation.evaluate()) {
       return true
     }

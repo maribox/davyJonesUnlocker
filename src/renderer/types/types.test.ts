@@ -19,8 +19,12 @@ function randomMathTerm(): string {
   const randomMathTerm = (): any => {
     const terms = [randomTerm()]
     for (let i = 0; i < randomInt(0, 5); i++) {
-      terms.push(randomOperator())
-      terms.push(randomTerm())
+      const operator = randomOperator()
+      const term = randomTerm()
+      if (!(operator === '/' && term === '0')) {
+        terms.push(operator)
+        terms.push(term)
+      }
     }
     return terms.join('')
   }
@@ -28,8 +32,9 @@ function randomMathTerm(): string {
 }
 
 test('random tests', () => {
-  for (let i = 0; i < 100; i++) {
-    mathTermTest(randomMathTerm())
+  for (let i = 0; i < 500; i++) {
+    const term = randomMathTerm()
+    mathTermTest(term)
   }
 })
 
@@ -72,4 +77,28 @@ test('random-math-test', () => {
       mathTermTest(term)
     }
   }
+})
+
+test('specific tests', () => {
+  mathTermTest('-2 - 25/48')
+})
+
+test('invalid tests', () => {
+  expect(() => new MathTerm('1+')).toThrow(Error)
+  expect(() => new MathTerm('1+1+')).toThrow(Error)
+  expect(() => new MathTerm('1+5/65*2+')).toThrow(Error)
+  expect(() => new MathTerm('(-1)+5/65*(-2)-1+')).toThrow(Error)
+  expect(() => new MathTerm('console.log("test")')).toThrow(Error)
+  expect(() => new MathTerm('1/0')).toThrow(Error)
+  expect(() => new MathTerm('Math.sqrt(-1)')).toThrow(Error)
+  expect(() => new MathTerm('1+*2')).toThrow(Error)
+  expect(() => new MathTerm('1+(2')).toThrow(Error)
+  expect(() => new MathTerm('Math.sin()')).toThrow(Error)
+  expect(() => new MathTerm('Math.pow(2, 3, 4)')).toThrow(Error)
+  expect(() => new MathTerm('Math.random(10)')).toThrow(Error)
+  expect(() => new MathTerm('Math.abs("hello")')).toThrow(Error)
+  expect(() => new MathTerm('Math.log(-1)')).toThrow(Error)
+  expect(() => new MathTerm('Math.max()')).toThrow(Error)
+  expect(() => new MathTerm('Math.min()')).toThrow(Error)
+  expect(() => new MathTerm('sqrt(4)')).not.toThrow(Error)
 })
